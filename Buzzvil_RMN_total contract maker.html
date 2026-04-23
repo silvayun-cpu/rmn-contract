@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>버즈빌 RMN 제휴 통합 계약서 생성기</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #888;
+    --line: #e5e5e5;
+    --line-soft: #f0f0f0;
+    --bg: #fafaf7;
+    --panel: #ffffff;
+    --accent: #1357F5;
+    --accent-soft: #e8efff;
+    --highlight: #fff4a3;
+    --highlight-strong: #ffea70;
+    --danger: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    font-family: "맑은 고딕", "Malgun Gothic", -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  body { display: flex; flex-direction: column; overflow: hidden; }
+
+  header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  header .subtitle {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  header .actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn {
+    padding: 9px 16px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+  .btn:hover { background: #000; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+  }
+  .btn.ghost:hover { background: var(--line-soft); }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    min-height: 0;
+  }
+
+  /* Left panel */
+  .sidebar {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 18px 18px 40px;
+  }
+  .section {
+    padding: 14px 0 16px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .section:last-child { border-bottom: none; }
+  .section > h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+  .field { margin-bottom: 10px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .field input[type="text"],
+  .field input[type="date"],
+  .field input[type="number"] {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 13px;
+    background: white;
+    color: var(--ink);
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    background: white;
+  }
+  .checkbox-row:hover { border-color: var(--ink-muted); }
+  .checkbox-row.checked {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .checkbox-row input { margin-top: 2px; cursor: pointer; accent-color: var(--accent); }
+  .checkbox-row .cb-label { font-weight: 600; font-size: 13px; }
+  .checkbox-row .cb-desc { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+  .case-sub {
+    margin-top: 8px;
+    padding-left: 12px;
+    border-left: 2px solid var(--line);
+  }
+  .case-sub .case-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 12px;
+  }
+
+  .row-inline {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 7px;
+  }
+  .row-inline label {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .row-inline input {
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    text-align: right;
+    background: white;
+  }
+  .row-inline input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .module-group {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .module-group.disabled { opacity: .4; pointer-events: none; }
+  .module-group h4 {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  /* Preview */
+  .preview-wrap {
+    overflow-y: auto;
+    padding: 30px 50px 80px;
+  }
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    background: white;
+    padding: 60px 70px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    border-radius: 2px;
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #222;
+  }
+  .page h1.title {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+  .page h2.article {
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+  .page .module-tag {
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .page h3.subhead {
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+  .page p { margin: 4px 0; }
+  .page p.indent1 { padding-left: 20px; }
+  .page p.indent2 { padding-left: 40px; }
+  .page table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 11.5px;
+  }
+  .page th, .page td {
+    border: 1px solid #999;
+    padding: 6px 8px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .page th { background: #d9d9d9; font-weight: 700; }
+  .page td.left { text-align: left; }
+  .page .hl { background: var(--highlight); padding: 1px 2px; }
+  .page tr.hl td, .page td.hl { background: #fff2cc; }
+  .page .sig-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .page .sig-table td {
+    width: 50%;
+    text-align: left;
+    vertical-align: top;
+    padding: 14px 18px;
+    line-height: 1.9;
+  }
+  .page .date-line {
+    text-align: center;
+    margin: 24px 0 14px;
+    font-weight: 700;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--ink-muted);
+    font-size: 13px;
+  }
+
+  /* Loading overlay */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .overlay.active { display: flex; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>버즈빌 RMN 제휴 통합 계약서 생성기</h1>
+    <div class="subtitle">모듈 선택 + 요율 입력 → Word 파일 다운로드</div>
+  </div>
+  <div class="actions">
+    <button class="btn ghost" id="resetBtn">초기화</button>
+    <button class="btn" id="downloadBtn">Word 다운로드</button>
+  </div>
+</header>
+
+<main>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <div class="section">
+      <h3>기본 정보</h3>
+      <div class="field">
+        <label>고객사명</label>
+        <input type="text" id="clientName" placeholder="예: 주식회사 무신사" value="주식회사 OOO">
+      </div>
+      <div class="field">
+        <label>계약 시작일</label>
+        <input type="date" id="startDate">
+      </div>
+      <div class="field">
+        <label>계약 종료일</label>
+        <input type="date" id="endDate">
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>적용 모듈 선택</h3>
+      <label class="checkbox-row" data-module="m1">
+        <input type="checkbox" id="cb-m1" checked>
+        <div>
+          <div class="cb-label">모듈 1. 버즈베네핏 (오퍼월)</div>
+          <div class="cb-desc">버즈빌이 수주한 광고를 매체사 지면에 노출</div>
+        </div>
+      </label>
+
+      <label class="checkbox-row" data-module="m2">
+        <input type="checkbox" id="cb-m2">
+        <div>
+          <div class="cb-label">모듈 2. 입점사 광고 (RMP)</div>
+          <div class="cb-desc">매체 입점사 광고 → 매체사 지면 (on-site)</div>
+        </div>
+      </label>
+
+      <label class="checkbox-row" data-module="m3">
+        <input type="checkbox" id="cb-m3">
+        <div>
+          <div class="cb-label">모듈 3. 협력광고</div>
+          <div class="cb-desc">매체 입점사 광고 → 버즈빌 제휴 매체 지면 (off-site)</div>
+        </div>
+      </label>
+
+      <label class="checkbox-row" data-module="m4">
+        <input type="checkbox" id="cb-m4">
+        <div>
+          <div class="cb-label">모듈 4. 버즈부스터</div>
+          <div class="cb-desc">마케팅 캠페인 솔루션 (출석체크·스탬프 등)</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- 모듈 1 세부 -->
+    <div class="section module-group" id="opts-m1">
+      <h4>모듈 1 세부 설정 (버즈베네핏)</h4>
+      <div class="row-inline">
+        <label>노출형 R/S (고객사:버즈빌)</label>
+        <input type="text" id="rs-impression" value="6:4">
+      </div>
+      <div class="row-inline">
+        <label>액션형 R/S</label>
+        <input type="text" id="rs-action" value="7:3">
+      </div>
+      <div class="row-inline">
+        <label>ADN R/S</label>
+        <input type="text" id="rs-adn" value="7:3">
+      </div>
+      <div class="row-inline">
+        <label>콘텐츠 광고 정산배수</label>
+        <input type="text" id="mult-content" value="1~1.7" placeholder="예: 1~1.7">
+      </div>
+      <div class="row-inline">
+        <label>멀티미션 정산배수</label>
+        <input type="text" id="mult-multi" value="1.2" placeholder="예: 1.2">
+      </div>
+    </div>
+
+    <!-- 모듈 2 세부 -->
+    <div class="section module-group" id="opts-m2">
+      <h4>모듈 2 세부 설정 (RMP)</h4>
+      <div class="field">
+        <label>영업 케이스</label>
+        <div class="case-sub">
+          <label class="case-item"><input type="radio" name="rmp-case" value="A" checked> 케이스 A (매체사 직영업)</label>
+          <label class="case-item"><input type="radio" name="rmp-case" value="B"> 케이스 B (버즈빌 영업 지원)</label>
+          <label class="case-item"><input type="radio" name="rmp-case" value="BOTH"> 둘 다 명시</label>
+        </div>
+      </div>
+      <div class="row-inline">
+        <label>케이스 A 수수료율 (%)</label>
+        <input type="number" id="rate-rmp-a" placeholder="예: 15" min="0" max="100" step="0.1">
+      </div>
+      <div class="row-inline">
+        <label>케이스 B 수수료율 (%)</label>
+        <input type="number" id="rate-rmp-b" placeholder="예: 25" min="0" max="100" step="0.1">
+      </div>
+      <div class="row-inline">
+        <label>고객사 자체광고 포함</label>
+        <input type="checkbox" id="cb-self-ad" style="justify-self: end; width: 16px; height: 16px;">
+      </div>
+      <div style="font-size: 11px; color: var(--ink-muted); padding: 4px 2px; line-height: 1.4;">※ 고객사 자체광고는 수수료 없음 (포함 시 시스템 등록용)</div>
+    </div>
+
+    <!-- 모듈 3 세부 -->
+    <div class="section module-group" id="opts-m3">
+      <h4>모듈 3 세부 설정 (협력광고)</h4>
+      <div class="field">
+        <label>정산 방향</label>
+        <div class="case-sub">
+          <label class="case-item"><input type="radio" name="coop-dir" value="CtoB" checked> 고객사 → 버즈빌 수수료 지급</label>
+          <label class="case-item"><input type="radio" name="coop-dir" value="BtoC"> 버즈빌 → 고객사 수수료 지급</label>
+          <label class="case-item"><input type="radio" name="coop-dir" value="NONE"> 수수료 없음</label>
+        </div>
+      </div>
+      <div class="row-inline">
+        <label>수수료율 (%)</label>
+        <input type="number" id="rate-coop" placeholder="공란 시 미기재" min="0" max="100" step="0.1">
+      </div>
+    </div>
+
+    <!-- 모듈 4 세부 -->
+    <div class="section module-group" id="opts-m4">
+      <h4>모듈 4 세부 설정 (버즈부스터)</h4>
+      <div class="row-inline">
+        <label>월 기본 요금 (원)</label>
+        <input type="number" id="booster-fee" value="100000" placeholder="예: 100000">
+      </div>
+      <div class="row-inline">
+        <label>월 기본 제공 건수</label>
+        <input type="number" id="booster-quota" value="25000" placeholder="예: 25000">
+      </div>
+      <div class="row-inline">
+        <label>Basic 플랜(무상) 적용</label>
+        <input type="checkbox" id="cb-booster-basic" style="justify-self: end; width: 16px; height: 16px;">
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Preview -->
+  <div class="preview-wrap">
+    <div class="page" id="preview"></div>
+  </div>
+</main>
+
+<div class="overlay" id="overlay">Word 파일 생성 중…</div>
+
+<!-- docx library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.cjs"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<script>
+// ============================================================
+// STATE & INIT
+// ============================================================
+const state = {
+  clientName: '주식회사 OOO',
+  startDate: '',
+  endDate: '',
+  modules: { m1: true, m2: false, m3: false, m4: false },
+  rs: { impression: '6:4', action: '7:3', adn: '7:3' },
+  mult: { content: '1~1.7', multi: '1.2' },
+  rmp: { case: 'A', rateA: '', rateB: '', selfAd: false },
+  coop: { direction: 'CtoB', rate: '' },
+  booster: { fee: '100000', quota: '25000', basic: false },
+};
+
+// Set default dates
+(function initDates() {
+  const now = new Date();
+  const yr = now.getFullYear();
+  state.startDate = `${yr}-01-01`;
+  state.endDate = `${yr + 1}-12-31`;
+  document.getElementById('startDate').value = state.startDate;
+  document.getElementById('endDate').value = state.endDate;
+})();
+
+// ============================================================
+// BIND EVENTS
+// ============================================================
+function bindInputs() {
+  document.getElementById('clientName').addEventListener('input', e => {
+    state.clientName = e.target.value || '주식회사 OOO';
+    render();
+  });
+  document.getElementById('startDate').addEventListener('change', e => {
+    state.startDate = e.target.value; render();
+  });
+  document.getElementById('endDate').addEventListener('change', e => {
+    state.endDate = e.target.value; render();
+  });
+
+  ['m1','m2','m3','m4'].forEach(m => {
+    document.getElementById('cb-' + m).addEventListener('change', e => {
+      state.modules[m] = e.target.checked;
+      document.querySelector(`.checkbox-row[data-module="${m}"]`).classList.toggle('checked', e.target.checked);
+      document.getElementById('opts-' + m).classList.toggle('disabled', !e.target.checked);
+      render();
+    });
+    // initial state
+    const checked = document.getElementById('cb-' + m).checked;
+    document.querySelector(`.checkbox-row[data-module="${m}"]`).classList.toggle('checked', checked);
+    document.getElementById('opts-' + m).classList.toggle('disabled', !checked);
+  });
+
+  // Module 1
+  document.getElementById('rs-impression').addEventListener('input', e => { state.rs.impression = e.target.value; render(); });
+  document.getElementById('rs-action').addEventListener('input', e => { state.rs.action = e.target.value; render(); });
+  document.getElementById('rs-adn').addEventListener('input', e => { state.rs.adn = e.target.value; render(); });
+  document.getElementById('mult-content').addEventListener('input', e => { state.mult.content = e.target.value; render(); });
+  document.getElementById('mult-multi').addEventListener('input', e => { state.mult.multi = e.target.value; render(); });
+
+  // Module 2
+  document.querySelectorAll('input[name="rmp-case"]').forEach(r => r.addEventListener('change', e => {
+    state.rmp.case = e.target.value; render();
+  }));
+  document.getElementById('rate-rmp-a').addEventListener('input', e => { state.rmp.rateA = e.target.value; render(); });
+  document.getElementById('rate-rmp-b').addEventListener('input', e => { state.rmp.rateB = e.target.value; render(); });
+  document.getElementById('cb-self-ad').addEventListener('change', e => { state.rmp.selfAd = e.target.checked; render(); });
+
+  // Module 3
+  document.querySelectorAll('input[name="coop-dir"]').forEach(r => r.addEventListener('change', e => {
+    state.coop.direction = e.target.value; render();
+  }));
+  document.getElementById('rate-coop').addEventListener('input', e => { state.coop.rate = e.target.value; render(); });
+
+  // Module 4
+  document.getElementById('booster-fee').addEventListener('input', e => { state.booster.fee = e.target.value; render(); });
+  document.getElementById('booster-quota').addEventListener('input', e => { state.booster.quota = e.target.value; render(); });
+  document.getElementById('cb-booster-basic').addEventListener('change', e => { state.booster.basic = e.target.checked; render(); });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('모든 입력을 초기화합니다.')) location.reload();
+  });
+  document.getElementById('downloadBtn').addEventListener('click', downloadWord);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtDate(dateStr) {
+  if (!dateStr) return 'OOOO년 OO월 OO일';
+  const [y,m,d] = dateStr.split('-');
+  return `${y}년 ${m}월 ${d}일`;
+}
+function blankOrVal(v, unit='%') {
+  if (v === '' || v === null || v === undefined) return { text: '___' + unit, highlight: true };
+  return { text: v + unit, highlight: false };
+}
+function pct(v) { return blankOrVal(v, '%'); }
+
+// Active modules list (ordered)
+function activeModules() {
+  const ms = [];
+  if (state.modules.m1) ms.push('m1');
+  if (state.modules.m2) ms.push('m2');
+  if (state.modules.m3) ms.push('m3');
+  if (state.modules.m4) ms.push('m4');
+  return ms;
+}
+
+// ============================================================
+// PREVIEW (HTML) — dynamically numbered based on active modules
+// ============================================================
+function render() {
+  const p = document.getElementById('preview');
+  const modules = activeModules();
+
+  if (modules.length === 0) {
+    p.innerHTML = '<div class="empty-state">왼쪽에서 최소 1개 이상의 모듈을 선택하세요.</div>';
+    return;
+  }
+
+  // Article numbering: 1=목적, 2=용어정의, 3=적용서비스, 4+=모듈들, 이후=공통조항
+  let articleNum = 4;
+  const moduleArticleNums = {};
+  modules.forEach(m => { moduleArticleNums[m] = articleNum++; });
+  const commonStart = articleNum;
+
+  let html = '';
+
+  // Title
+  html += `<h1 class="title">버즈빌 RMN 제휴 통합 계약서</h1>`;
+  html += `<p>${state.clientName} (이하 <b>"고객사"</b>)와 주식회사 버즈빌 (이하 <b>"버즈빌"</b>)은 상호 신뢰를 바탕으로 다음과 같이 계약을 체결한다.</p>`;
+
+  // Article 1
+  html += `<h2 class="article">제1조 (목적)</h2>`;
+  html += `<p>본 계약은 "버즈빌"이 제공하는 버즈빌 솔루션을 "고객사"가 사용하여 이를 "유저"에게 제공함에 있어, 양 당사자간의 권리·의무 관계 및 제반 사항을 규정함을 목적으로 한다.</p>`;
+
+  // Article 2 (용어 정의) — only include relevant terms per module
+  html += `<h2 class="article">제2조 (용어의 정의)</h2>`;
+  html += `<p>① 본 계약에서 사용되는 용어의 정의는 다음 각 호와 같다.</p>`;
+  const terms = buildTerms();
+  terms.forEach((t, i) => {
+    html += `<p class="indent1">${i+1}. ${t.hl ? '<span class="hl">' + t.text + '</span>' : t.text}</p>`;
+  });
+  html += `<p>② 전 항에 규정된 용어의 정의는 본 계약 및 본 계약에 대한 변경 계약에 한하여 유효하며, 전 항에 규정되지 않은 용어의 해석은 관련법령 또는 상관례에 따른다.</p>`;
+
+  // Article 3 — 적용 서비스
+  html += `<h2 class="article">제3조 (본 계약 적용 서비스)</h2>`;
+  html += `<p>"고객사"와 "버즈빌"은 아래 표에 명시된 서비스 모듈에 한하여 본 계약의 해당 조항을 적용한다.</p>`;
+  html += `<table><thead><tr><th style="width:18%">적용</th><th>서비스 모듈</th><th style="width:20%">해당 조항</th></tr></thead><tbody>`;
+  if (state.modules.m1) html += `<tr><td>☑</td><td class="left">모듈 1. 버즈베네핏 (오퍼월)</td><td>제${moduleArticleNums.m1}조</td></tr>`;
+  if (state.modules.m2) html += `<tr><td>☑</td><td class="left">모듈 2. 입점사 광고 (RMP)</td><td>제${moduleArticleNums.m2}조</td></tr>`;
+  if (state.modules.m3) html += `<tr><td>☑</td><td class="left">모듈 3. 협력광고</td><td>제${moduleArticleNums.m3}조</td></tr>`;
+  if (state.modules.m4) html += `<tr><td>☑</td><td class="left">모듈 4. 버즈부스터</td><td>제${moduleArticleNums.m4}조</td></tr>`;
+  html += `</tbody></table>`;
+
+  // Modules
+  if (state.modules.m1) html += renderM1(moduleArticleNums.m1);
+  if (state.modules.m2) html += renderM2(moduleArticleNums.m2);
+  if (state.modules.m3) html += renderM3(moduleArticleNums.m3);
+  if (state.modules.m4) html += renderM4(moduleArticleNums.m4);
+
+  // Common clauses (제N조~)
+  html += renderCommon(commonStart);
+
+  // Signature
+  html += `<p style="margin-top:24px">양 당사자는 이상 상호 합의된 내용이 자신의 의사와 일치함을 확인하며, 계약서 2부를 작성하여 기명 날인하고 각각 1부씩 보관한다.</p>`;
+  html += `<div class="date-line">${fmtDate(state.startDate)}</div>`;
+  html += `<table class="sig-table"><tr>`;
+  html += `<td><b>"고객사"</b><br>${state.clientName}<br>(주소)<br>대표이사 성명 (인)</td>`;
+  html += `<td><b>"버즈빌"</b><br>주식회사 버즈빌<br>서울시 송파구 석촌호수로 272 MY빌딩 2~5F<br>대표이사 이관우 (인)</td>`;
+  html += `</tr></table>`;
+
+  p.innerHTML = html;
+}
+
+// ============================================================
+// TERMS BUILDER (only include terms for active modules)
+// ============================================================
+function buildTerms() {
+  const t = [];
+  t.push({ text: '"고객사 서비스"란 "고객사"가 제공하는 서비스를 말한다. "고객사"는 "고객사 유저"에 대한 효율적인 "고객사 서비스"를 제공하기 위하여 모바일 Application(이하 "고객사 앱")을 운영한다.' });
+  t.push({ text: '"유저"란 버즈빌 솔루션 사용에 동의한 고객사 유저를 말한다.' });
+  if (state.modules.m1 || state.modules.m2 || state.modules.m4) {
+    t.push({ text: '"포인트"란 "유저"가 버즈빌 솔루션 이용을 통해 취득한 재화에 준하는 점수로서, "고객사 약관"에 정한 바에 따라 "고객사 서비스" 또는 "고객사"의 제휴가맹점에서 상품을 구입하거나 서비스를 이용하고 그에 따른 대금 결제에 사용할 수 있다.' });
+    t.push({ text: '"고객사 약관"이란 "고객사 서비스" 약관을 의미하며, "유저"가 "고객사 서비스"를 이용함에 있어 "유저" 및 "고객사"의 제반 권리, 의무와 관련 절차 등을 규정하고 "유저"와 "고객사"가 회원가입 계약의 내용으로 하기로 합의한 것을 말한다.' });
+  }
+  t.push({ text: '"광고"란 광고주가 특정 물품 또는 용역을 판매(다운로드 포함)·홍보하기 위하여 "버즈베네핏 지면" 또는 "버즈빌 광고 네트워크"에 게재, 노출하는 용역을 말한다.' });
+  t.push({ text: '"대시보드"란 버즈빌 솔루션 운영에 수반되는 통계 및 매출 데이터를 제공하는 관리운영시스템을 말한다.' });
+  t.push({ text: '"부정 행위"란 "고객사"의 "유저"가 "고객사"가 운영하는 지면 및 "버즈빌"의 광고상품을 남용하거나 "고객사"가 이를 묵인하는 행위를 의미하며, 구체적 유형은 업계 관행을 따르되 최종 판단 권한은 "버즈빌"이 갖는다.' });
+
+  if (state.modules.m1) {
+    t.push({ text: '"버즈베네핏"이란 "유저"에게 "광고" 등을 제공하고 "유저"가 클릭 등 특정 행위를 이행한 경우 해당 "유저"에게 약정된 포인트를 지급하는 솔루션을 말한다.' });
+    t.push({ text: '"싱글미션 광고"란 광고주가 설정한 단일 목표를 달성하기 위해 "유저"가 수행해야 하는 행동이 1개로 구성된 광고 유형을 말하며, 노출형 광고, 액션형 광고, 콘텐츠 광고로 세분화된다.' });
+    t.push({ text: '"멀티미션 광고"란 2개 이상의 "싱글미션 광고" 요소를 결합하여 구성한 광고로, "유저"가 수행해야 하는 행동이 복수로 설계된 복합형 광고를 말한다.' });
+    t.push({ text: '"광고수익"이란 "유저"의 "광고" 참여에 따라 발생하는 매출에서 영업비용을 제외한 실질적인 광고 제공 수익 금액을 말한다.' });
+    t.push({ text: '"매체비"란 "버즈베네핏" 솔루션을 통해 "버즈빌"이 얻은 "광고 수익" 중 일부를 "고객사"에게 지급하는 금액을 말한다.' });
+    t.push({ text: '"애드네트워크 광고"란 버즈빌 직영업 물량 외 다수의 광고미디어를 네트워크로 묶어 광고를 수주하고 광고 물량을 제공하는 업체로부터 수급한 물량을 말한다.' });
+  }
+
+  if (state.modules.m4) {
+    t.push({ text: '"버즈부스터"란 유저 인게이지먼트 강화를 위해 "버즈베네핏" 혹은 "고객사 서비스"에서 "포인트"를 활용하여 "유저"를 대상으로 이벤트(출석체크, 스탬프 등)를 운영할 수 있는 솔루션을 말한다.' });
+    t.push({ text: '"버즈부스터 사용료"란 "고객사"에서 필요에 의해 "버즈부스터" 이벤트를 운영할 경우, 유저의 참여 건당 "버즈빌"에게 "고객사"가 지급해야 하는 금액을 말한다.' });
+  }
+
+  if (state.modules.m2) {
+    t.push({ text: '"입점사 광고"란 "고객사"가 자사 입점 브랜드사 또는 "고객사"가 직접 수주한 제3자 광고주로부터 수주하여 "고객사" 플랫폼 내 지면에 게재하는 "광고"를 의미한다.' });
+    t.push({ text: '"입점사 광고 수수료"란 "고객사"가 "입점사 광고" 운영에 대한 솔루션 이용 대가로 "버즈빌"에 지급하는 수수료를 말한다.' });
+    if (state.rmp.selfAd) {
+      t.push({ hl: true, text: '"고객사 자체 광고"란 "고객사"가 "입점사 광고"가 아닌 자체 마케팅 목적으로 자비 부담하여 "고객사" 플랫폼 내 지면에 게재하는 "광고"를 의미하며, "입점사 광고"와 동일한 시스템을 통해 운영된다. "고객사 자체 광고"는 실제 "광고 매출"의 정산이 진행되지 않으며, 운영 현황 관리를 위해 시스템에 등록하여 운영하되 별도의 수수료는 부과하지 아니한다.' });
+    }
+  }
+
+  if (state.modules.m3) {
+    t.push({ text: '"협력 광고"란 "고객사"의 1st Party Data와 카탈로그를 활용하여 입점 브랜드사의 광고를 "고객사" 플랫폼이 아닌 "버즈빌"이 운영하는 버즈빌 광고 네트워크에 송출하는 인앱 이벤트 기반의 정밀 타겟팅 광고 상품을 의미한다.' });
+    t.push({ text: '"1st Party Data"란 "고객사"가 직접 수집·보유한 이용자 행동 데이터, 관심사 데이터, 구매 데이터 등 "고객사" 내에서 생성된 "고객사"의 이용자 데이터를 말한다.' });
+  }
+  return t;
+}
+
+// ============================================================
+// MODULE RENDERERS (preview)
+// ============================================================
+function renderM1(num) {
+  const c = state.mult.content;
+  const mm = state.mult.multi;
+  let h = `<h2 class="article"><span class="module-tag">[모듈 1]</span>제${num}조 (버즈베네핏 / 오퍼월)</h2>`;
+  h += `<h3 class="subhead">1. 제휴 업무의 내용 및 역할</h3>`;
+  h += `<p>① "고객사"는 "고객사 앱"에 "버즈베네핏" 솔루션을 연동하고, "유저"에게 지급된 포인트를 관리한다.</p>`;
+  h += `<p>② "버즈빌"은 "버즈베네핏" 솔루션의 개발·관리·유지보수 및 광고 수주·집행을 담당한다.</p>`;
+  h += `<h3 class="subhead">2. 매체비</h3>`;
+  h += `<p>① "매체비" 정산은 "버즈빌"이 "고객사"에게 제공하는 "대시보드"를 기준으로 한다.</p>`;
+  h += `<table><thead><tr><th>광고 분류</th><th>상세 분류</th><th>매체비</th><th>비고</th></tr></thead><tbody>`;
+  h += `<tr><td rowspan="3">싱글미션 광고</td><td>노출형 광고</td><td>${state.rs.impression} = 고객사 : 버즈빌</td><td>"광고수익"의 R/S</td></tr>`;
+  h += `<tr><td>액션형 광고</td><td>${state.rs.action} = 고객사 : 버즈빌</td><td>"광고수익"의 R/S</td></tr>`;
+  h += `<tr><td>콘텐츠 광고</td><td>"유저" 지급 "포인트" × 정산배수(${c || '___'})</td><td>콘텐츠 광고별 상이</td></tr>`;
+  h += `<tr><td>멀티미션 광고</td><td>-</td><td>"유저" 지급 "포인트" × 정산배수(${mm || '___'})</td><td></td></tr>`;
+  h += `<tr><td>애드네트워크 광고</td><td>-</td><td>${state.rs.adn} = 고객사 : 버즈빌</td><td>"광고수익"의 R/S</td></tr>`;
+  h += `</tbody></table>`;
+  h += `<h3 class="subhead">3. 정산</h3>`;
+  h += `<p>① "고객사"와 "버즈빌"은 매월 1일부터 말일 사이의 기간을 당월(M)으로 지칭하며, 당월 기준 "매체비"를 월 단위로 정산한다.</p>`;
+  h += `<p>② "고객사"가 당월 말일을 작성일자로 세금계산서를 발급하며, "버즈빌"은 세금계산서 수령일로부터 최대 60일 이내에 해당 금액을 지정 계좌에 현금 입금한다.</p>`;
+  h += `<p>③ "고객사"가 본 계약에 규정된 "고객사"의 역할을 위반하거나, "고객사"의 "유저"가 "부정 행위"로 "광고"를 소진한 경우, "버즈빌"은 "매체비" 지급을 보류하거나 피해액 상당액을 공제할 수 있다.</p>`;
+  return h;
+}
+
+function renderM2(num) {
+  const ra = pct(state.rmp.rateA);
+  const rb = pct(state.rmp.rateB);
+  const showA = state.rmp.case === 'A' || state.rmp.case === 'BOTH';
+  const showB = state.rmp.case === 'B' || state.rmp.case === 'BOTH';
+
+  let h = `<h2 class="article"><span class="module-tag">[모듈 2]</span>제${num}조 (입점사 광고 / RMP)</h2>`;
+
+  if (state.rmp.case === 'BOTH') {
+    h += `<h3 class="subhead">0. 영업 케이스</h3>`;
+    h += `<p>본 조는 아래 두 가지 영업 케이스 중 해당하는 케이스를 적용한다. 적용 케이스는 별도 합의로 특정한다.</p>`;
+    h += `<p class="indent1">• <b>케이스 A. 매체사 직영업</b> — "고객사"가 "입점사 광고"를 직접 영업·수주하고 운영하며, "버즈빌"은 솔루션 및 기술 지원만 제공한다.</p>`;
+    h += `<p class="indent1">• <b>케이스 B. 버즈빌 영업 지원</b> — "고객사"와 "버즈빌"이 공동으로 "입점사 광고"를 영업·수주하며, "버즈빌"이 영업 지원 대가로 별도 수수료를 수취한다.</p>`;
+  } else {
+    const caseLabel = state.rmp.case === 'A' ? '케이스 A (매체사 직영업)' : '케이스 B (버즈빌 영업 지원)';
+    const caseDesc = state.rmp.case === 'A'
+      ? '"고객사"가 "입점사 광고"를 직접 영업·수주하고 운영하며, "버즈빌"은 솔루션 및 기술 지원만 제공한다.'
+      : '"고객사"와 "버즈빌"이 공동으로 "입점사 광고"를 영업·수주하며, "버즈빌"이 영업 지원 대가로 별도 수수료를 수취한다.';
+    h += `<p><b>영업 케이스:</b> ${caseLabel} — ${caseDesc}</p>`;
+  }
+
+  h += `<h3 class="subhead">1. 제휴 업무의 내용 및 역할</h3>`;
+  h += `<p>① "고객사"의 역할: 입점 브랜드사 대상 "입점사 광고" 영업 및 운영${state.rmp.case === 'B' ? '(필요 시 "버즈빌"과 공동 수행)' : ''}${state.rmp.selfAd ? ', "고객사 자체 광고"의 기획·예산 편성·집행 관리' : ''}</p>`;
+  h += `<p>② "버즈빌"의 역할: "입점사 광고" 운영을 위한 솔루션 제공 및 기술 지원${showB ? ', 케이스 B 적용 시 영업 지원 및 광고 수주 협력' : ''}</p>`;
+
+  h += `<h3 class="subhead">2. 수수료</h3>`;
+  h += `<table><thead><tr><th>구분</th><th>수수료</th></tr></thead><tbody>`;
+  if (showA) h += `<tr class="hl"><td>입점사 광고 (케이스 A)</td><td>"입점사 광고"의 "광고 매출" × ${ra.text} (VAT 별도)</td></tr>`;
+  if (showB) h += `<tr class="hl"><td>입점사 광고 (케이스 B)</td><td>"입점사 광고"의 "광고 매출" × ${rb.text} (VAT 별도)</td></tr>`;
+  if (state.rmp.selfAd) h += `<tr class="hl"><td>고객사 자체 광고</td><td>수수료 없음</td></tr>`;
+  h += `</tbody></table>`;
+
+  h += `<h3 class="subhead">3. 정산</h3>`;
+  h += `<p>① "고객사"와 "버즈빌"은 당월(M)의 수수료 금액을 상호 확인한 후 "버즈빌"이 당월 말일을 작성일자로 세금계산서를 "고객사"에 발급한다.</p>`;
+  h += `<p>② "고객사"는 동 세금계산서를 수령한 날로부터 최대 60일 이내에 해당 금액을 지정한 은행계좌에 현금 입금한다.</p>`;
+  return h;
+}
+
+function renderM3(num) {
+  const rc = pct(state.coop.rate);
+  let h = `<h2 class="article"><span class="module-tag">[모듈 3]</span>제${num}조 (협력광고)</h2>`;
+  h += `<h3 class="subhead">1. 제휴 업무의 내용 및 역할</h3>`;
+  h += `<p>① "고객사"는 플랫폼 입점 브랜드사에 "협력광고"를 제안·중개하며, 광고 계약 체결 현황과 광고비 수령 내역을 "버즈빌"에 적시에 제공한다. 중개 시 「표시·광고의 공정화에 관한 법률」 등 관계 법령을 준수한다.</p>`;
+  h += `<p>② "버즈빌"은 "협력광고" 집행 시 1st Party Data 타겟팅 활용에 관한 기술적 연동 및 운영을 이행하며, 성과 데이터를 "고객사" 및 광고주가 확인할 수 있도록 관리자 시스템 또는 정기 보고서를 통해 제공한다.</p>`;
+
+  h += `<h3 class="subhead">2. 1st Party Data 활용</h3>`;
+  h += `<p>① "고객사"는 "1st Party Data"를 "협력광고" 타겟팅 목적으로 "버즈빌"에 제공하여야 한다. 수집·제공·활용의 적법성에 관한 책임은 "고객사"에게 있다.</p>`;
+  h += `<p>② "버즈빌"은 제공받은 데이터를 본 계약에 따른 타겟팅 목적으로만 사용하며, 제3자에게 무단으로 제공할 수 없고 계약 종료 시 즉시 파기 또는 반환하여야 한다.</p>`;
+
+  if (state.coop.direction === 'NONE') {
+    h += `<h3 class="subhead">3. 수수료</h3>`;
+    h += `<p class="hl" style="padding:4px">"협력광고" 집행에 대해 "고객사"와 "버즈빌" 간 별도의 수수료는 발생하지 않는다.</p>`;
+  } else {
+    const dirLabel = state.coop.direction === 'CtoB' ? '"고객사" → "버즈빌"' : '"버즈빌" → "고객사"';
+    const issuer = state.coop.direction === 'CtoB' ? '"버즈빌"' : '"고객사"';
+    h += `<h3 class="subhead">3. 수수료</h3>`;
+    h += `<p>① "협력광고" 수수료 정산은 "버즈빌"이 "고객사"에게 제공하는 "대시보드"를 기준으로 한다.</p>`;
+    h += `<table><thead><tr><th>구분</th><th>수수료</th></tr></thead><tbody>`;
+    h += `<tr class="hl"><td>협력광고 수수료</td><td>"협력광고"의 "광고 매출" × ${rc.text} (VAT 별도)</td></tr>`;
+    h += `</tbody></table>`;
+    h += `<h3 class="subhead">4. 정산</h3>`;
+    h += `<p class="hl" style="padding:4px">① 정산 흐름: ${dirLabel} / 세금계산서 발행 주체: ${issuer}</p>`;
+    h += `<p>② 당월(M) 말일을 작성일자로 세금계산서를 발급하며, 수령일로부터 최대 60일 이내에 지정 계좌에 현금 입금한다.</p>`;
+  }
+  return h;
+}
+
+function renderM4(num) {
+  let h = `<h2 class="article"><span class="module-tag">[모듈 4]</span>제${num}조 (버즈부스터)</h2>`;
+  h += `<h3 class="subhead">1. 제휴 업무의 내용 및 역할</h3>`;
+  h += `<p>① "고객사"는 "고객사 앱"에 "버즈부스터" 솔루션을 연동하고, 이벤트 참여 "유저"에게 지급되는 포인트를 부담·운영한다.</p>`;
+  h += `<p>② "버즈빌"은 "버즈부스터" 솔루션의 개발·관리·유지보수 및 관련 VOC 응대를 담당한다.</p>`;
+  h += `<h3 class="subhead">2. 버즈부스터 사용료</h3>`;
+  if (state.booster.basic) {
+    h += `<p class="hl" style="padding:4px">"고객사" 지원 정책의 일환으로 "버즈부스터" Basic 플랜을 적용하여 "버즈부스터 사용료"를 청구하지 않는다.</p>`;
+  } else {
+    const fee = state.booster.fee ? Number(state.booster.fee).toLocaleString('ko-KR') + '원' : '___원';
+    const quota = state.booster.quota ? Number(state.booster.quota).toLocaleString('ko-KR') + '건' : '___건';
+    const hl = (!state.booster.fee || !state.booster.quota) ? ' hl' : '';
+    h += `<p>① "버즈부스터" 참여로 유저에게 지급해야 하는 "포인트"는 "고객사"가 부담하며, "버즈부스터 사용료"는 다음과 같다.</p>`;
+    h += `<table><thead><tr><th>이벤트 유형</th><th>기본 단가 (VAT 별도)</th></tr></thead><tbody>`;
+    h += `<tr><td class="left">출석체크 / 스탬프 / 친구 초대 / 마케팅 수신 동의</td><td class="hl">월 ${fee} 기본 제공 건수 ${quota}</td></tr>`;
+    h += `</tbody></table>`;
+    h += `<p>② 기본 제공 건수 초과 시, 아래 누적 구간별 단가가 초과 건수에 적용된다.</p>`;
+    h += `<table><thead><tr><th>월 누적 사용 건수</th><th>초과분 단가 (VAT 별도)</th></tr></thead><tbody>`;
+    h += `<tr class="hl"><td>0 ~ 25,000건</td><td>기본 요금제 (월 100,000원 정액)</td></tr>`;
+    h += `<tr class="hl"><td>25,001 ~ 150,000건 구간</td><td>3.0원/건</td></tr>`;
+    h += `<tr class="hl"><td>150,001 ~ 1,000,000건 구간</td><td>2.3원/건</td></tr>`;
+    h += `<tr class="hl"><td>1,000,001 ~ 3,000,000건 구간</td><td>2.0원/건</td></tr>`;
+    h += `<tr class="hl"><td>3,000,001 ~ 5,000,000건 구간</td><td>1.7원/건</td></tr>`;
+    h += `<tr class="hl"><td>5,000,001건 이상 구간</td><td>1.4원/건</td></tr>`;
+    h += `</tbody></table>`;
+  }
+  h += `<h3 class="subhead">3. 정산</h3>`;
+  h += `<p>"버즈빌"이 당월(M) 말일을 작성일자로 세금계산서를 "고객사"에 발급하며, "고객사"는 수령일로부터 최대 60일 이내에 지정 계좌에 입금한다.</p>`;
+  return h;
+}
+
+// ============================================================
+// COMMON CLAUSES
+// ============================================================
+function commonClauseData(start) {
+  // Returns list of { title, paragraphs: [...] } starting from 'start' article number
+  const list = [];
+  list.push({
+    title: '지식재산권',
+    paras: [
+      '① "고객사"는 "버즈빌"이 본 계약에 따라 제공되는 버즈빌 솔루션 및 모든 사본에 대한 모든 권리와 지식 재산권을 보유한다는 것을 인정하고 이에 동의한다. "고객사"는 본 계약의 존속 중 뿐만 아니라 계약 종료 후에도 버즈빌 솔루션의 지식 재산권에 대한 소유권을 주장하거나 이의를 제기하지 않을 것에 동의한다.',
+      '② "고객사"는 어떤 방식으로든 버즈빌 솔루션을 수정하거나 리버스 엔지니어링하지 않아야 하며, 버즈빌 솔루션 형태의 경쟁 관계에 있는 제품을 개발할 수 없다. 버즈빌 솔루션에 대한 수정은 "버즈빌"의 유일하고 독점적인 재산이 된다.'
+    ]
+  });
+  list.push({
+    title: '보증 및 책임',
+    paras: [
+      '"버즈빌"은 본 계약에 따라 제공 및 노출되는 "광고"가 다음 각 호의 기준을 충족함을 보증한다. 1) 제3자의 저작권, 인격권, 초상권 등 권리를 침해하지 아니할 것 / 2) 내용이 정확·적절하며 사회상규에 반하지 아니할 것 / 3) 관계법령을 위반하는 행위가 없을 것.'
+    ]
+  });
+  list.push({
+    title: '비밀유지 의무',
+    paras: [
+      '각 당사자는 "비밀정보"를 본 계약상 목적 이외의 다른 용도로 사용할 수 없다. 각 당사자는 어떠한 경우에도 상대방의 사전 서면승인 없이는 "비밀정보"를 복사, 복제, 가공하거나 제3자에게 제공, 판매, 발표할 수 없으며, 자신의 고의 또는 과실로 인하여 "비밀정보"가 외부로 유출될 경우 그에 대한 책임을 부담한다.'
+    ]
+  });
+  list.push({
+    title: '개인정보보호 의무',
+    paras: [
+      '① 각 당사자는 이용자의 정보를 상대방에게 제공한다는 사실을 이용자에게 고지하여 동의를 획득해야 하며, 개인정보를 본 계약상 목적 이외 용도로 사용하거나 상대방의 사전 서면승인 없이 제3자에게 제공·판매할 수 없다.',
+      '② 각 당사자는 관련법령에서 규정하고 있는 관리적·기술적 보호조치를 준수해야 할 의무가 있으며, 본 조항의 의무를 위반하여 상대방 또는 제3자에게 손해가 발생할 경우 그에 대한 책임을 부담한다.',
+      '③ "버즈빌"은 버즈빌 솔루션 운영을 위한 최소한의 개인정보를 수집·이용하며, 수집 항목은 암호화된 고객 식별값, 광고식별자(ADID, IDFA), 성별, 생년월일 등으로 한정한다. 보유기간은 서비스 이용 동의 철회 또는 회원 탈퇴 요청 5일 후 지체없이 파기한다.'
+    ]
+  });
+  list.push({
+    title: '양도금지',
+    paras: [
+      '"고객사"와 "버즈빌"은 본 계약 또는 본 계약 상의 개별 권리 또는 의무의 전부 또는 일부를 상대방의 사전 서면 동의 없이 제3자에게 양도, 담보제공 등 처분하거나 제3자에게 대행하게 할 수 없다.'
+    ]
+  });
+  list.push({
+    title: '계약기간',
+    paras: [
+      `① 본 계약은 ${fmtDate(state.startDate)}("계약기간 시작일")부터 ${fmtDate(state.endDate)}("계약기간 만료일")까지로 한다.`,
+      '② 일방당사자가 상대방에 대하여 계약조건의 변경요청 또는 계약을 연장할 의사가 없음을 "계약기간 만료일" 30일 전까지 서면으로 통지하지 않는 한 동일한 조건으로 1년씩 연장된다.'
+    ]
+  });
+  list.push({
+    title: '계약의 해지',
+    paras: [
+      '① 본 계약의 일방당사자가 본 계약에 규정된 자신의 의무를 위반하거나 불성실하게 이행할 경우 상대방은 서면 또는 유선으로 그 시정 또는 개선을 요구할 수 있으며, 그로부터 7일 이내에 유책당사자의 시정 또는 개선조치가 없을 경우 상대방은 서면통지로 본 계약을 해지할 수 있다.',
+      '② 파산·회생·영업정지·재무상태의 현저한 악화 등 원활한 계약실현을 저해하는 사유가 발생한 경우 상대방은 즉시 서면통지로 본 계약을 해지할 수 있다.',
+      '③ "버즈빌"이 본 계약상 역할을 수행할 수 있는 상황임에도 불구하고 "고객사"가 솔루션의 개시를 추진하지 않고 본 계약을 일방적으로 해지하는 경우, "고객사"는 "고객사"가 "버즈빌"에 요청한 개발 업무로 인해 "버즈빌"에 발생한 제반 비용을 "버즈빌"에 지급해야 한다.'
+    ]
+  });
+  list.push({
+    title: '손해배상',
+    paras: [
+      '① 각 당사자는 본 계약의 이행 과정에서 일방의 귀책사유로 상대방에게 손해를 입힌 경우, 상대방에게 발생한 직접적이고 합리적으로 특정 가능한 손해에 한하여 배상책임을 부담한다.',
+      '② 본 계약과 관련한 손해배상책임은, 사건 발생 직전 3개월간의 거래액을 기준으로 계산한 월평균 거래액을 초과하여 부담하지 않는다. 단, 일방의 고의로 인한 경우는 제외한다.'
+    ]
+  });
+  list.push({
+    title: '계약 변경',
+    paras: [
+      '"고객사"의 광고 정책 변경, 시스템 통합, 본 계약 제3조에 따른 적용 서비스 모듈의 추가·제외 등의 사유가 발생한 경우, 양사는 서면 합의로 본 계약의 내용을 변경할 수 있다.'
+    ]
+  });
+  list.push({
+    title: '일반조항',
+    paras: [
+      '① 천재지변, 정부의 명령, 법원의 판결 등 불가항력인 사유로 인하여 당사자 일방이 본 계약을 이행할 수 없는 경우에는 계약 불이행책임을 부담하지 아니한다. 동 사유로 계약 불이행 상태가 30일 이상 지속되는 경우 당사자 일방은 본 계약을 해지할 수 있다.',
+      '② 각 당사자는 상대방에 대하여 독립한 지위에서 본 계약을 체결하며, 본 계약상의 권리행사 및 의무이행에 있어 상대방의 대리인 또는 대표자로 간주되지 아니한다.',
+      '③ 본 계약은 대한민국 법률의 적용을 받으며, 해석상 명확하지 아니한 부분이 발생할 경우에는 관계법령 및 상관례에 따른다.',
+      '④ 본 계약과 관련하여 분쟁이 발생할 경우 먼저 양 당사자 사이의 대화를 통하여 해결하되, 합의에 의하여 해결되지 아니할 경우에는 서울중앙지방법원을 제1심 전속 관할법원으로 한다.'
+    ]
+  });
+  return list;
+}
+
+function renderCommon(startNum) {
+  const list = commonClauseData(startNum);
+  let h = '';
+  list.forEach((c, i) => {
+    h += `<h2 class="article">제${startNum + i}조 (${c.title})</h2>`;
+    c.paras.forEach(p => { h += `<p>${p}</p>`; });
+  });
+  return h;
+}
+
+// ============================================================
+// WORD GENERATION (docx)
+// ============================================================
+async function downloadWord() {
+  const modules = activeModules();
+  if (modules.length === 0) {
+    alert('최소 1개 이상의 모듈을 선택해주세요.');
+    return;
+  }
+
+  document.getElementById('overlay').classList.add('active');
+
+  try {
+    const {
+      Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+      AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign,
+      HeightRule
+    } = window.docx;
+
+    const FONT = '맑은 고딕';
+    const SIZE = 20;
+    const HEADER_FILL = 'D9D9D9';
+    const HL_FILL = 'FFF2CC';
+
+    const border = { style: BorderStyle.SINGLE, size: 4, color: '999999' };
+    const borders = { top: border, bottom: border, left: border, right: border };
+
+    const T = (text, opts = {}) => new TextRun({ text, font: FONT, size: SIZE, ...opts });
+    const Tb = (text, opts = {}) => new TextRun({ text, font: FONT, size: SIZE, bold: true, ...opts });
+    const Thl = (text, opts = {}) => new TextRun({ text, font: FONT, size: SIZE, highlight: 'yellow', ...opts });
+    const P = (runsOrText, opts = {}) => {
+      const runs = Array.isArray(runsOrText) ? runsOrText : [T(runsOrText)];
+      return new Paragraph({ children: runs, spacing: { before: 40, after: 40, line: 300 }, ...opts });
+    };
+    const Indent = (text, level = 1) => new Paragraph({
+      children: [T(text)],
+      spacing: { before: 20, after: 20, line: 280 },
+      indent: { left: 360 * level },
+    });
+    const Article = (num, title, tag) => {
+      const kids = [new TextRun({ text: `제${num}조 `, font: FONT, size: 24, bold: true })];
+      if (tag) kids.push(new TextRun({ text: `[${tag}] `, font: FONT, size: 22, bold: true, color: 'C00000' }));
+      kids.push(new TextRun({ text: `(${title})`, font: FONT, size: 24, bold: true }));
+      return new Paragraph({ children: kids, spacing: { before: 280, after: 140 } });
+    };
+    const Sub = (t) => new Paragraph({
+      children: [Tb(t)],
+      spacing: { before: 140, after: 80 }
+    });
+
+    const Cell = (content, { w, fill, header, align, hl, rowSpan, colSpan } = {}) => {
+      const paras = (Array.isArray(content) ? content : [content]).map(c => {
+        if (c instanceof Paragraph) return c;
+        let runs;
+        if (typeof c === 'string') {
+          runs = [hl ? Thl(c, { bold: !!header }) : new TextRun({ text: c, font: FONT, size: SIZE, bold: !!header })];
+        } else {
+          runs = [c];
+        }
+        return new Paragraph({ alignment: align || AlignmentType.LEFT, children: runs });
+      });
+      const opts = {
+        borders,
+        width: { size: w, type: WidthType.DXA },
+        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        children: paras,
+        verticalAlign: VerticalAlign.CENTER,
+      };
+      if (fill || hl) opts.shading = { fill: fill || HL_FILL, type: ShadingType.CLEAR };
+      if (rowSpan) opts.rowSpan = rowSpan;
+      if (colSpan) opts.columnSpan = colSpan;
+      return new TableCell(opts);
+    };
+
+    // ---------------- Build content ----------------
+    const children = [];
+
+    // Title
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 0, after: 240 },
+      children: [new TextRun({ text: '버즈빌 RMN 제휴 통합 계약서', font: FONT, size: 36, bold: true })]
+    }));
+
+    // Preamble
+    children.push(P([
+      T(`${state.clientName} (이하 `), Tb('"고객사"'),
+      T(')와 주식회사 버즈빌 (이하 '), Tb('"버즈빌"'),
+      T(')은 상호 신뢰를 바탕으로 다음과 같이 계약을 체결한다.')
+    ]));
+
+    // 제1조 목적
+    children.push(Article(1, '목적'));
+    children.push(P('본 계약은 "버즈빌"이 제공하는 버즈빌 솔루션을 "고객사"가 사용하여 이를 "유저"에게 제공함에 있어, 양 당사자간의 권리·의무 관계 및 제반 사항을 규정함을 목적으로 한다.'));
+
+    // 제2조 용어정의
+    children.push(Article(2, '용어의 정의'));
+    children.push(P('① 본 계약에서 사용되는 용어의 정의는 다음 각 호와 같다.'));
+    const terms = buildTerms();
+    terms.forEach((t, i) => {
+      const runs = [
+        t.hl ? Thl(`${i+1}. `) : T(`${i+1}. `),
+        t.hl ? Thl(t.text) : T(t.text)
+      ];
+      children.push(new Paragraph({
+        children: runs,
+        spacing: { before: 20, after: 20, line: 280 },
+        indent: { left: 360 }
+      }));
+    });
+    children.push(P('② 전 항에 규정된 용어의 정의는 본 계약 및 본 계약에 대한 변경 계약에 한하여 유효하며, 전 항에 규정되지 않은 용어의 해석은 관련법령 또는 상관례에 따른다.'));
+
+    // 제3조 적용서비스
+    let artNum = 4;
+    const moduleNums = {};
+    modules.forEach(m => { moduleNums[m] = artNum++; });
+    const commonStart = artNum;
+
+    children.push(Article(3, '본 계약 적용 서비스'));
+    children.push(P('"고객사"와 "버즈빌"은 아래 표에 명시된 서비스 모듈에 한하여 본 계약의 해당 조항을 적용한다.'));
+
+    const modTblRows = [new TableRow({
+      tableHeader: true,
+      children: [
+        Cell('적용', { w: 1500, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('서비스 모듈', { w: 4500, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('해당 조항', { w: 3000, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+      ]
+    })];
+    const modLabels = {
+      m1: '모듈 1. 버즈베네핏 (오퍼월)',
+      m2: '모듈 2. 입점사 광고 (RMP)',
+      m3: '모듈 3. 협력광고',
+      m4: '모듈 4. 버즈부스터'
+    };
+    modules.forEach(m => {
+      modTblRows.push(new TableRow({
+        children: [
+          Cell('☑', { w: 1500, align: AlignmentType.CENTER }),
+          Cell(modLabels[m], { w: 4500 }),
+          Cell(`제${moduleNums[m]}조`, { w: 3000, align: AlignmentType.CENTER }),
+        ]
+      }));
+    });
+    children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [1500,4500,3000], rows: modTblRows }));
+    children.push(P(' '));
+
+    // Modules
+    if (state.modules.m1) buildM1(children, moduleNums.m1, { Cell, Sub, Article, P, Indent, T, Tb, Thl, AlignmentType, Table, TableRow, WidthType, HEADER_FILL });
+    if (state.modules.m2) buildM2(children, moduleNums.m2, { Cell, Sub, Article, P, Indent, T, Tb, Thl, AlignmentType, Table, TableRow, WidthType, HEADER_FILL });
+    if (state.modules.m3) buildM3(children, moduleNums.m3, { Cell, Sub, Article, P, Indent, T, Tb, Thl, AlignmentType, Table, TableRow, WidthType, HEADER_FILL });
+    if (state.modules.m4) buildM4(children, moduleNums.m4, { Cell, Sub, Article, P, Indent, T, Tb, Thl, AlignmentType, Table, TableRow, WidthType, HEADER_FILL });
+
+    // Common clauses
+    const commons = commonClauseData(commonStart);
+    commons.forEach((c, i) => {
+      children.push(Article(commonStart + i, c.title));
+      c.paras.forEach(p => children.push(P(p)));
+    });
+
+    // Signature
+    children.push(P('양 당사자는 이상 상호 합의된 내용이 자신의 의사와 일치함을 확인하며, 계약서 2부를 작성하여 기명 날인하고 각각 1부씩 보관한다.'));
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 240, after: 240 },
+      children: [new TextRun({ text: fmtDate(state.startDate), font: FONT, size: 22, bold: true })]
+    }));
+    const sigRows = [new TableRow({
+      children: [
+        Cell([
+          new Paragraph({ children: [Tb('"고객사"')] }),
+          new Paragraph({ children: [T(state.clientName)] }),
+          new Paragraph({ children: [T('(주소)')] }),
+          new Paragraph({ children: [T('대표이사 성명 (인)')] }),
+        ], { w: 4500 }),
+        Cell([
+          new Paragraph({ children: [Tb('"버즈빌"')] }),
+          new Paragraph({ children: [T('주식회사 버즈빌')] }),
+          new Paragraph({ children: [T('서울시 송파구 석촌호수로 272 MY빌딩 2~5F')] }),
+          new Paragraph({ children: [T('대표이사 이관우 (인)')] }),
+        ], { w: 4500 }),
+      ]
+    })];
+    children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [4500,4500], rows: sigRows }));
+
+    // Document
+    const doc = new Document({
+      styles: { default: { document: { run: { font: FONT, size: SIZE } } } },
+      sections: [{
+        properties: {
+          page: {
+            size: { width: 11906, height: 16838 },
+            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+          }
+        },
+        children
+      }]
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const fname = `버즈빌_RMN_통합계약서_${state.clientName.replace(/주식회사\s*/g,'').trim() || 'OOO'}_${new Date().toISOString().slice(0,10)}.docx`;
+    saveAs(blob, fname);
+
+  } catch (err) {
+    console.error(err);
+    alert('Word 파일 생성 중 오류가 발생했습니다: ' + err.message);
+  } finally {
+    document.getElementById('overlay').classList.remove('active');
+  }
+}
+
+// ---- Module builders for Word ----
+function buildM1(children, num, h) {
+  const { Cell, Sub, Article, P, AlignmentType, Table, TableRow, WidthType, HEADER_FILL } = h;
+  const mContent = state.mult.content || '___';
+  const mMulti = state.mult.multi || '___';
+  const contentHl = !state.mult.content;
+  const multiHl = !state.mult.multi;
+
+  children.push(Article(num, '버즈베네핏 (오퍼월)', '모듈 1'));
+
+  children.push(Sub('1. 제휴 업무의 내용 및 역할'));
+  children.push(P('① "고객사"는 "고객사 앱"에 "버즈베네핏" 솔루션을 연동하고, "유저"에게 지급된 포인트를 관리한다.'));
+  children.push(P('② "버즈빌"은 "버즈베네핏" 솔루션의 개발·관리·유지보수 및 광고 수주·집행을 담당한다.'));
+
+  children.push(Sub('2. 매체비'));
+  children.push(P('① "매체비" 정산은 "버즈빌"이 "고객사"에게 제공하는 "대시보드"를 기준으로 한다.'));
+
+  const rows = [
+    new TableRow({
+      tableHeader: true, children: [
+        Cell('광고 분류', { w: 2000, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('상세 분류', { w: 1800, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('매체비', { w: 3400, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('비고', { w: 1800, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+      ]
+    }),
+    new TableRow({ children: [
+      Cell('싱글미션 광고', { w: 2000, align: AlignmentType.CENTER }),
+      Cell('노출형 광고', { w: 1800, align: AlignmentType.CENTER }),
+      Cell(`${state.rs.impression} = 고객사 : 버즈빌`, { w: 3400, align: AlignmentType.CENTER }),
+      Cell('"광고수익"의 R/S', { w: 1800, align: AlignmentType.CENTER }),
+    ]}),
+    new TableRow({ children: [
+      Cell('', { w: 2000 }),
+      Cell('액션형 광고', { w: 1800, align: AlignmentType.CENTER }),
+      Cell(`${state.rs.action} = 고객사 : 버즈빌`, { w: 3400, align: AlignmentType.CENTER }),
+      Cell('"광고수익"의 R/S', { w: 1800, align: AlignmentType.CENTER }),
+    ]}),
+    new TableRow({ children: [
+      Cell('', { w: 2000 }),
+      Cell('콘텐츠 광고', { w: 1800, align: AlignmentType.CENTER }),
+      Cell(`"유저" 지급 "포인트" × 정산배수(${mContent})`, { w: 3400, align: AlignmentType.CENTER }),
+      Cell('콘텐츠 광고별 상이', { w: 1800, align: AlignmentType.CENTER }),
+    ]}),
+    new TableRow({ children: [
+      Cell('멀티미션 광고', { w: 2000, align: AlignmentType.CENTER }),
+      Cell('-', { w: 1800, align: AlignmentType.CENTER }),
+      Cell(`"유저" 지급 "포인트" × 정산배수(${mMulti})`, { w: 3400, align: AlignmentType.CENTER }),
+      Cell('', { w: 1800 }),
+    ]}),
+    new TableRow({ children: [
+      Cell('애드네트워크 광고', { w: 2000, align: AlignmentType.CENTER }),
+      Cell('-', { w: 1800, align: AlignmentType.CENTER }),
+      Cell(`${state.rs.adn} = 고객사 : 버즈빌`, { w: 3400, align: AlignmentType.CENTER }),
+      Cell('"광고수익"의 R/S', { w: 1800, align: AlignmentType.CENTER }),
+    ]}),
+  ];
+  children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [2000,1800,3400,1800], rows }));
+  children.push(P(' '));
+
+  children.push(Sub('3. 정산'));
+  children.push(P('① "고객사"와 "버즈빌"은 매월 1일부터 말일 사이의 기간을 당월(M)으로 지칭하며, 당월 기준 "매체비"를 월 단위로 정산한다.'));
+  children.push(P('② "고객사"가 당월 말일을 작성일자로 세금계산서를 발급하며, "버즈빌"은 세금계산서 수령일로부터 최대 60일 이내에 해당 금액을 지정 계좌에 현금 입금한다.'));
+  children.push(P('③ "고객사"가 본 계약에 규정된 "고객사"의 역할을 위반하거나, "고객사"의 "유저"가 "부정 행위"로 "광고"를 소진한 경우, "버즈빌"은 "매체비" 지급을 보류하거나 피해액 상당액을 공제할 수 있다.'));
+}
+
+function buildM2(children, num, h) {
+  const { Cell, Sub, Article, P, AlignmentType, Table, TableRow, WidthType, HEADER_FILL } = h;
+  const rateA = state.rmp.rateA;
+  const rateB = state.rmp.rateB;
+  const showA = state.rmp.case === 'A' || state.rmp.case === 'BOTH';
+  const showB = state.rmp.case === 'B' || state.rmp.case === 'BOTH';
+
+  children.push(Article(num, '입점사 광고 (RMP)', '모듈 2'));
+
+  if (state.rmp.case === 'BOTH') {
+    children.push(Sub('0. 영업 케이스'));
+    children.push(P('본 조는 아래 두 가지 영업 케이스 중 해당하는 케이스를 적용하며, 적용 케이스는 별도 합의로 특정한다.'));
+    children.push(P('• 케이스 A. 매체사 직영업 — "고객사"가 "입점사 광고"를 직접 영업·수주하고 운영하며, "버즈빌"은 솔루션 및 기술 지원만 제공한다.'));
+    children.push(P('• 케이스 B. 버즈빌 영업 지원 — "고객사"와 "버즈빌"이 공동으로 "입점사 광고"를 영업·수주하며, "버즈빌"이 영업 지원 대가로 별도 수수료를 수취한다.'));
+  } else {
+    const label = state.rmp.case === 'A' ? '케이스 A (매체사 직영업)' : '케이스 B (버즈빌 영업 지원)';
+    const desc = state.rmp.case === 'A'
+      ? '"고객사"가 "입점사 광고"를 직접 영업·수주하고 운영하며, "버즈빌"은 솔루션 및 기술 지원만 제공한다.'
+      : '"고객사"와 "버즈빌"이 공동으로 "입점사 광고"를 영업·수주하며, "버즈빌"이 영업 지원 대가로 별도 수수료를 수취한다.';
+    children.push(P(`영업 케이스: ${label} — ${desc}`));
+  }
+
+  children.push(Sub('1. 제휴 업무의 내용 및 역할'));
+  children.push(P(`① "고객사"의 역할: 입점 브랜드사 대상 "입점사 광고" 영업 및 운영${state.rmp.case === 'B' ? '(필요 시 "버즈빌"과 공동 수행)' : ''}${state.rmp.selfAd ? ', "고객사 자체 광고"의 기획·예산 편성·집행 관리' : ''}`));
+  children.push(P(`② "버즈빌"의 역할: "입점사 광고" 운영을 위한 솔루션 제공 및 기술 지원${showB ? ', 케이스 B 적용 시 영업 지원 및 광고 수주 협력' : ''}`));
+
+  children.push(Sub('2. 수수료'));
+  const feeRows = [new TableRow({
+    tableHeader: true, children: [
+      Cell('구분', { w: 3000, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+      Cell('수수료', { w: 6000, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+    ]
+  })];
+  if (showA) feeRows.push(new TableRow({ children: [
+    Cell('입점사 광고 (케이스 A)', { w: 3000, align: AlignmentType.CENTER, hl: true }),
+    Cell(`"입점사 광고"의 "광고 매출" × ${rateA || '___'}% (VAT 별도)`, { w: 6000, align: AlignmentType.CENTER, hl: true }),
+  ]}));
+  if (showB) feeRows.push(new TableRow({ children: [
+    Cell('입점사 광고 (케이스 B)', { w: 3000, align: AlignmentType.CENTER, hl: true }),
+    Cell(`"입점사 광고"의 "광고 매출" × ${rateB || '___'}% (VAT 별도)`, { w: 6000, align: AlignmentType.CENTER, hl: true }),
+  ]}));
+  if (state.rmp.selfAd) feeRows.push(new TableRow({ children: [
+    Cell('고객사 자체 광고', { w: 3000, align: AlignmentType.CENTER, hl: true }),
+    Cell(`수수료 없음`, { w: 6000, align: AlignmentType.CENTER, hl: true }),
+  ]}));
+  children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [3000,6000], rows: feeRows }));
+  children.push(P(' '));
+
+  children.push(Sub('3. 정산'));
+  children.push(P('① "고객사"와 "버즈빌"은 당월(M)의 수수료 금액을 상호 확인한 후 "버즈빌"이 당월 말일을 작성일자로 세금계산서를 "고객사"에 발급한다.'));
+  children.push(P('② "고객사"는 동 세금계산서를 수령한 날로부터 최대 60일 이내에 해당 금액을 지정한 은행계좌에 현금 입금한다.'));
+}
+
+function buildM3(children, num, h) {
+  const { Cell, Sub, Article, P, AlignmentType, Table, TableRow, WidthType, HEADER_FILL } = h;
+  const rate = state.coop.rate;
+  const dir = state.coop.direction;
+
+  children.push(Article(num, '협력광고', '모듈 3'));
+
+  children.push(Sub('1. 제휴 업무의 내용 및 역할'));
+  children.push(P('① "고객사"는 플랫폼 입점 브랜드사에 "협력광고"를 제안·중개하며, 광고 계약 체결 현황과 광고비 수령 내역을 "버즈빌"에 적시에 제공한다. 중개 시 「표시·광고의 공정화에 관한 법률」 등 관계 법령을 준수한다.'));
+  children.push(P('② "버즈빌"은 "협력광고" 집행 시 1st Party Data 타겟팅 활용에 관한 기술적 연동 및 운영을 이행하며, 성과 데이터를 "고객사" 및 광고주가 확인할 수 있도록 관리자 시스템 또는 정기 보고서를 통해 제공한다.'));
+
+  children.push(Sub('2. 1st Party Data 활용'));
+  children.push(P('① "고객사"는 "1st Party Data"를 "협력광고" 타겟팅 목적으로 "버즈빌"에 제공하여야 하며, 수집·제공·활용의 적법성에 관한 책임은 "고객사"에게 있다.'));
+  children.push(P('② "버즈빌"은 제공받은 데이터를 본 계약에 따른 타겟팅 목적으로만 사용하며, 제3자에게 무단으로 제공할 수 없고 계약 종료 시 즉시 파기 또는 반환하여야 한다.'));
+
+  if (dir === 'NONE') {
+    children.push(Sub('3. 수수료'));
+    children.push(new Paragraph({
+      children: [new TextRun({
+        text: '"협력광고" 집행에 대해 "고객사"와 "버즈빌" 간 별도의 수수료는 발생하지 않는다.',
+        font: '맑은 고딕', size: 20, highlight: 'yellow'
+      })],
+      spacing: { before: 40, after: 40, line: 300 }
+    }));
+  } else {
+    const dirLabel = dir === 'CtoB' ? '"고객사" → "버즈빌"' : '"버즈빌" → "고객사"';
+    const issuer = dir === 'CtoB' ? '"버즈빌"' : '"고객사"';
+    children.push(Sub('3. 수수료'));
+    const feeRows = [
+      new TableRow({ tableHeader: true, children: [
+        Cell('구분', { w: 3000, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('수수료', { w: 6000, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+      ]}),
+      new TableRow({ children: [
+        Cell('협력광고 수수료', { w: 3000, align: AlignmentType.CENTER, hl: true }),
+        Cell(`"협력광고"의 "광고 매출" × ${rate || '___'}% (VAT 별도)`, { w: 6000, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+    ];
+    children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [3000,6000], rows: feeRows }));
+    children.push(P(' '));
+    children.push(Sub('4. 정산'));
+    children.push(new Paragraph({
+      children: [new TextRun({
+        text: `① 정산 흐름: ${dirLabel} / 세금계산서 발행 주체: ${issuer}`,
+        font: '맑은 고딕', size: 20, highlight: 'yellow'
+      })],
+      spacing: { before: 40, after: 40, line: 300 }
+    }));
+    children.push(P('② 당월(M) 말일을 작성일자로 세금계산서를 발급하며, 수령일로부터 최대 60일 이내에 지정 계좌에 현금 입금한다.'));
+  }
+}
+
+function buildM4(children, num, h) {
+  const { Cell, Sub, Article, P, AlignmentType, Table, TableRow, WidthType, HEADER_FILL } = h;
+
+  children.push(Article(num, '버즈부스터', '모듈 4'));
+
+  children.push(Sub('1. 제휴 업무의 내용 및 역할'));
+  children.push(P('① "고객사"는 "고객사 앱"에 "버즈부스터" 솔루션을 연동하고, 이벤트 참여 "유저"에게 지급되는 포인트를 부담·운영한다.'));
+  children.push(P('② "버즈빌"은 "버즈부스터" 솔루션의 개발·관리·유지보수 및 관련 VOC 응대를 담당한다.'));
+
+  children.push(Sub('2. 버즈부스터 사용료'));
+  if (state.booster.basic) {
+    children.push(new Paragraph({
+      children: [new TextRun({
+        text: '"고객사" 지원 정책의 일환으로 "버즈부스터" Basic 플랜을 적용하여 "버즈부스터 사용료"를 청구하지 않는다.',
+        font: '맑은 고딕', size: 20, highlight: 'yellow'
+      })],
+      spacing: { before: 40, after: 40, line: 300 }
+    }));
+  } else {
+    const fee = state.booster.fee ? Number(state.booster.fee).toLocaleString('ko-KR') + '원' : '___원';
+    const quota = state.booster.quota ? Number(state.booster.quota).toLocaleString('ko-KR') + '건' : '___건';
+    const needsHl = !state.booster.fee || !state.booster.quota;
+    children.push(P('① "버즈부스터" 참여로 유저에게 지급해야 하는 "포인트"는 "고객사"가 부담하며, "버즈부스터 사용료"는 다음과 같다.'));
+    const brows = [
+      new TableRow({ tableHeader: true, children: [
+        Cell('이벤트 유형', { w: 4500, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('기본 단가 (VAT 별도)', { w: 4500, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+      ]}),
+      new TableRow({ children: [
+        Cell('출석체크 / 스탬프 / 친구 초대 / 마케팅 수신 동의', { w: 4500 }),
+        Cell(`월 ${fee} 기본 제공 건수 ${quota}`, { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+    ];
+    children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [4500,4500], rows: brows }));
+    children.push(P(' '));
+    children.push(P('② 기본 제공 건수 초과 시, 아래 누적 구간별 단가가 초과 건수에 적용된다.'));
+    const tierRows = [
+      new TableRow({ tableHeader: true, children: [
+        Cell('월 누적 사용 건수', { w: 4500, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+        Cell('초과분 단가 (VAT 별도)', { w: 4500, fill: HEADER_FILL, header: true, align: AlignmentType.CENTER }),
+      ]}),
+      new TableRow({ children: [
+        Cell('0 ~ 25,000건', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+        Cell('기본 요금제 (월 100,000원 정액)', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+      new TableRow({ children: [
+        Cell('25,001 ~ 150,000건 구간', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+        Cell('3.0원/건', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+      new TableRow({ children: [
+        Cell('150,001 ~ 1,000,000건 구간', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+        Cell('2.3원/건', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+      new TableRow({ children: [
+        Cell('1,000,001 ~ 3,000,000건 구간', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+        Cell('2.0원/건', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+      new TableRow({ children: [
+        Cell('3,000,001 ~ 5,000,000건 구간', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+        Cell('1.7원/건', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+      new TableRow({ children: [
+        Cell('5,000,001건 이상 구간', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+        Cell('1.4원/건', { w: 4500, align: AlignmentType.CENTER, hl: true }),
+      ]}),
+    ];
+    children.push(new Table({ width: { size: 9000, type: WidthType.DXA }, columnWidths: [4500,4500], rows: tierRows }));
+    children.push(P(' '));
+  }
+
+  children.push(Sub('3. 정산'));
+  children.push(P('"버즈빌"이 당월(M) 말일을 작성일자로 세금계산서를 "고객사"에 발급하며, "고객사"는 수령일로부터 최대 60일 이내에 지정 계좌에 입금한다.'));
+}
+
+// ============================================================
+// INIT
+// ============================================================
+bindInputs();
+render();
+</script>
+</body>
+</html>
